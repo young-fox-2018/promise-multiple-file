@@ -14,22 +14,22 @@ function readFilePromise(parentData) {
 }
 
 function matchParentsWithChildrens(parentFileName, childrenFileName) {
-  let dataParent = []
+  let parent = []
   readFilePromise(parentFileName)
-    .then(function(dataParents){
-      dataParent = dataParents
+    .then(function(parents){
+      parent = parents
       return readFilePromise(childrenFileName)
     })
     .then(function (dataChild) {
-      for(let i = 0; i < dataParent.length; i++) {
-        dataParent[i].childrens = [];
+      for(let i = 0; i < parent.length; i++) {
+        parent[i].childrens = [];
         for(let j = 0; j < dataChild.length; j++) {
-         if(dataChild[j].family === dataParent[i].last_name) {
-          dataParent[i].childrens.push(dataChild[j].full_name)
+         if(dataChild[j].family === parent[i].last_name) {
+          parent[i].childrens.push(dataChild[j].full_name)
          }
         } 
       }
-      console.log(dataParent)
+      console.log(parent)
     })
     .catch(function(err) {
       console.log(err)
