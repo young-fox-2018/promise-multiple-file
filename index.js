@@ -1,17 +1,66 @@
 const fs = require('fs');
-var sleep = require('sleep');
+// var sleep = require('sleep');
 
-function readFilePromise() {
-  // psst, the promise should be around here...
+function readFilePromise(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, "utf-8", (err, data) => {
+      if (err) reject(err)
+      else resolve(JSON.parse(data))
+    })
+  })
+}
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds) {
+      break;
+    }
+  }
 }
 
 function matchParentsWithChildrens(parentFileName, childrenFileName) {
-  // your code here... (p.s. readFilePromise function(s) should be around here..)
+  Promise.all([readFilePromise(parentFileName), readFilePromise(childrenFileName)])
+    .then((data) => {
+      let data_parents = data[0]
+      let data_childs = data[1]
+      for (let i = 0; i < data_parents.length; i++) {
+        data_parents[i].childrens = []
+        for (let j = 0; j < data_childs.length; j++) {
+          if (data_parents[i].last_name === data_childs[j].family) {
+            data_parents[i].childrens.push(data_childs[j].full_name)
+          }
+        }
+        console.log(data_parents);
+      }
+    })
+    .catch(function (err) {
+      console.log(err);
+    })
+
+  // readFilePromise(parentFileName)
+  //   .then((data) => {
+  //     console.log(data);
+
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+
+  //   })
+  // readFilePromise(childrenFileName)
+  //   .then((data) => {
+  //     console.log(data);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+
+  //   })
 }
 
 matchParentsWithChildrens('./parents.json', './childrens.json');
+sleep(1000)
 console.log("Notification : Data sedang diproses !");
 
 // for Release 2
-matchParentsWithChildrens('./parents.json', './not_a_real_file.json');
-matchParentsWithChildrens('./not_a_real_file.json', './also_not_a_real_file.json');
+// matchParentsWithChildrens('./parents.json', './not_a_real_file.json');
+// matchParentsWithChildrens('./not_a_real_file.json', './also_not_a_real_file.json');
