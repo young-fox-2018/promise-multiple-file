@@ -1,17 +1,71 @@
 const fs = require('fs');
-var sleep = require('sleep');
+//ar sleep = require('sleep');
+const childrenFile = 'childrens.json'
+const parentFile = 'parents.json'
 
-function readFilePromise() {
-  // psst, the promise should be around here...
+const readFilePromise = (file) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, 'utf8', (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(JSON.parse(data))
+      }
+    })
+  })
 }
 
-function matchParentsWithChildrens(parentFileName, childrenFileName) {
-  // your code here... (p.s. readFilePromise function(s) should be around here..)
+const matchParentsWithChildrens = (parentFileName, childrenFileName) => {
+  console.log('Data sedang diproses')
+
+  return new Promise((resolve, reject) => {
+    let parent = null
+
+    readFilePromise(parentFileName)
+      .then(parentData => {
+        parent = parentData
+        return readFilePromise(childrenFileName)
+      })
+      .then(childrenData => {
+          const data = parent.map((element) => {
+            const childrens = childrenData.filter(child=> child.family === element.last_name)
+                              .map(el => el.full_name)
+
+            element.childrens = childrens
+
+            return element
+          })
+
+          resolve(JSON.stringify(data, null ,4))
+        })
+      .catch(err => {
+          reject(err)
+        })
+  })
 }
 
-matchParentsWithChildrens('./parents.json', './childrens.json');
-console.log("Notification : Data sedang diproses !");
 
-// for Release 2
-matchParentsWithChildrens('./parents.json', './not_a_real_file.json');
-matchParentsWithChildrens('./not_a_real_file.json', './also_not_a_real_file.json');
+matchParentsWithChildrens('./parents.json', './childrens.json')
+  .then(data =>  {
+    console.log(data)
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+//for Release 2
+matchParentsWithChildrens('./parents.json', './not_a_real_file.json')
+  .then(data => {
+    console.log(data)
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+matchParentsWithChildrens('./not_a_real_file.json', './also_not_a_real_file.json')
+  .then(data => {
+        console.log(data)
+  })
+  .catch(err => {
+        console.log(err)
+  })
