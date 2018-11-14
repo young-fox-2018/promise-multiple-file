@@ -5,6 +5,7 @@ function readFilePromise(path) {
   return new Promise((resolve, reject) => {
     fs.readFile(path, "utf-8", (err, data) => {
       if (err) reject(err)
+
       else resolve(JSON.parse(data))
     })
   })
@@ -20,6 +21,8 @@ function sleep(milliseconds) {
 }
 
 function matchParentsWithChildrens(parentFileName, childrenFileName) {
+  console.log("Notification : Data sedang diproses !");
+  sleep(5000)
   Promise.all([readFilePromise(parentFileName), readFilePromise(childrenFileName)])
     .then((data) => {
       let data_parents = data[0]
@@ -31,35 +34,17 @@ function matchParentsWithChildrens(parentFileName, childrenFileName) {
             data_parents[i].childrens.push(data_childs[j].full_name)
           }
         }
+
         console.log(data_parents);
       }
     })
     .catch(function (err) {
       console.log(err);
     })
-
-  // readFilePromise(parentFileName)
-  //   .then((data) => {
-  //     console.log(data);
-
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-
-  //   })
-  // readFilePromise(childrenFileName)
-  //   .then((data) => {
-  //     console.log(data);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-
-  //   })
 }
 
 matchParentsWithChildrens('./parents.json', './childrens.json');
-sleep(1000)
-console.log("Notification : Data sedang diproses !");
+
 
 // for Release 2
 // matchParentsWithChildrens('./parents.json', './not_a_real_file.json');
